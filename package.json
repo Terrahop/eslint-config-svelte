@@ -1,0 +1,35 @@
+{
+  "name": "@terrahop/eslint-config-svelte",
+  "version": "0.0.1",
+  "author": "@terrahop",
+  "description": "Eslint configuration for svelte projects with typescript",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "version": "auto-changelog -p && git add CHANGELOG.md"
+  },
+  "auto-changelog": {
+    "output": "CHANGELOG.md",
+    "template": "changelog-template.hbs",
+    "commitLimit": false
+  },
+  "dependencies": {
+    "@stylistic/eslint-plugin": "2.8.0",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "eslint": "8.57.0",
+    "eslint-config-love": "47.0.0",
+    "eslint-plugin-eslint-comments": "3.2.0",
+    "eslint-plugin-jsdoc": "50.3.0",
+    "eslint-plugin-security": "3.0.1",
+    "eslint-plugin-sonarjs": "1.0.4",
+    "eslint-plugin-svelte": "2.44.1",
+    "eslint-plugin-unicorn": "55.0.0",
+    "svelte": "5.0.0-next.189",
+    "svelte-eslint-parser": "0.35.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.1.0",
+    "auto-changelog": "2.4.0"
+  }
+}

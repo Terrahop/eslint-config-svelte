@@ -1,5 +1,3 @@
-import { fileURLToPath } from 'node:url'
-import { includeIgnoreFile } from '@eslint/compat'
 import globals from 'globals'
 
 import js from '@eslint/js'
@@ -12,10 +10,7 @@ import pluginSvelte from 'eslint-plugin-svelte'
 import pluginJsdoc from 'eslint-plugin-jsdoc'
 import pluginLove from 'eslint-config-love'
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
-
 export default ts.config(
-  includeIgnoreFile(gitignorePath),
   js.configs.recommended,
   ...ts.configs.strictTypeChecked,
   ...ts.configs.stylisticTypeChecked,

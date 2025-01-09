@@ -1,6 +1,6 @@
 {
   "name": "@terrahop/eslint-config-svelte",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "@terrahop",
   "description": "Eslint configuration for svelte projects with typescript",
   "type": "module",

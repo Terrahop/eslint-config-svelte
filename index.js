@@ -77,6 +77,7 @@ export default ts.config(
     rules: {
       // Core
       'no-undef': 'off', // Doesn't work with typescript global types
+      'no-void': 'off', // conflicts with no-floating-promises
       'prefer-arrow-callback': 'error',
       'complexity': 'off', // conflicts with sonarjs/cognitive-complexity
       'eslint-comments/no-unlimited-disable': 'off',

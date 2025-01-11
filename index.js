@@ -78,7 +78,7 @@ export default ts.config(
       // Core
       'no-undef': 'off', // Doesn't work with typescript global types
       'prefer-arrow-callback': 'error',
-      'complexity': ['warn', { variant: 'modified', max: 10 }],
+      'complexity': 'off', // conflicts with sonarjs/cognitive-complexity
       'eslint-comments/no-unlimited-disable': 'off',
       'arrow-body-style': 'off', // jesus christ eslint-config-love, I thought you were suppose to make code more verbose and clear....
 

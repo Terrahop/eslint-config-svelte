@@ -68,7 +68,8 @@ export default ts.config(
           '@typescript-eslint/promise-function-async',
           'sonarjs/no-extra-arguments', // Does not pickup svelte's snippet args
           'sonarjs/no-use-of-empty-return-value', // Does not work with svelte's snippets
-          'sonarjs/no-unused-vars' // ^^
+          'sonarjs/no-unused-vars', // ^^
+          '@typescript-eslint/no-base-to-string'
         ]
       }
     },

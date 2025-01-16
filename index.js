@@ -69,7 +69,7 @@ export default ts.config(
           'sonarjs/no-extra-arguments', // Does not pickup svelte's snippet args
           'sonarjs/no-use-of-empty-return-value', // Does not work with svelte's snippets
           'sonarjs/no-unused-vars', // ^^
-          '@typescript-eslint/no-base-to-string'
+          '@typescript-eslint/no-base-to-string' // Breaks completely in svelte
         ]
       }
     },
@@ -80,8 +80,11 @@ export default ts.config(
       'no-void': 'off', // conflicts with no-floating-promises
       'prefer-arrow-callback': 'error',
       'complexity': 'off', // conflicts with sonarjs/cognitive-complexity
-      'eslint-comments/no-unlimited-disable': 'off',
       'arrow-body-style': 'off', // jesus christ eslint-config-love, I thought you were suppose to make code more verbose and clear....
+
+      'promise/avoid-new': 'off',
+
+      'eslint-comments/no-unlimited-disable': 'off',
 
       // Typescript plugin
       '@typescript-eslint/no-unused-vars': 'off', // tsserver already reports this
@@ -113,7 +116,8 @@ export default ts.config(
 
       // SonarJs plugin
       'sonarjs/todo-tag': 'off',
-      'sonarjs/void-use': 'off'
+      'sonarjs/void-use': 'off',
+      'sonarjs/no-nested-conditional': 'off',
     }
   },
 

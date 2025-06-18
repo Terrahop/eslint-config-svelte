@@ -16,7 +16,7 @@ export default ts.config(
   ...ts.configs.stylisticTypeChecked,
 
   pluginJsdoc.configs['flat/recommended-typescript'],
-  pluginUnicorn.configs['flat/recommended'],
+  pluginUnicorn.configs.recommended,
   pluginSecurity.configs.recommended,
   pluginSonar.configs.recommended,
 

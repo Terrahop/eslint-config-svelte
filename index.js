@@ -1,5 +1,4 @@
 import antfu from '@antfu/eslint-config'
-
 import pluginLove from 'eslint-config-love'
 import pluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import pluginCompat from 'eslint-plugin-compat'
@@ -86,15 +85,24 @@ export default antfu(
   { ...pluginSecurity.configs.recommended, name: 'security' },
   { ...pluginCompat.configs['flat/recommended'], name: 'compat' },
   { ...pluginSonarJs.configs.recommended, name: 'sonarjs ' },
-  // { name: 'love', languageOptions: { parserOptions: { tsconfigPath: './tsconfig.ts' } }, rules: pluginLoveRules },
   {
     name: 'better-tailwindcss',
     files: ['**/*.svelte'],
-    extends: [pluginBetterTailwindcss.configs['recommended-warn']],
+    plugins: {
+      'better-tailwindcss': pluginBetterTailwindcss,
+    },
     settings: {
       'better-tailwindcss': {
-        entryPoint: 'src/routes/layout.css',
+        entryPoint: 'src/app.css',
       },
+    },
+    rules: {
+      ...pluginBetterTailwindcss.configs['recommended-warn'].rules,
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', {
+        printWidth: 120,
+        group: 'newLine',
+        preferSingleLine: true,
+      }],
     },
   },
 
@@ -150,11 +158,6 @@ export default antfu(
       },
     },
     rules: {
-      'better-tailwindcss/enforce-consistent-line-wrapping': ['error', {
-        printWidth: 120,
-        group: 'newLine',
-        preferSingleLine: true,
-      }],
       // More opinionated style
       'svelte/consistent-selector-style': 'error',
       'svelte/html-closing-bracket-spacing': 'error',

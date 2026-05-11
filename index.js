@@ -1,87 +1,110 @@
-import { defineConfig } from 'eslint/config'
-import { includeIgnoreFile } from '@eslint/compat'
-import { fileURLToPath } from 'node:url'
-import globals from 'globals'
-
-// import prettierConfig from 'eslint-config-prettier'
 import antfu from '@antfu/eslint-config'
 
-import js from '@eslint/js'
-import ts from 'typescript-eslint'
-import pluginCompat from "eslint-plugin-compat"
-import pluginJsdoc from 'eslint-plugin-jsdoc'
 import pluginLove from 'eslint-config-love'
+import pluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
+import pluginCompat from 'eslint-plugin-compat'
 import pluginSecurity from 'eslint-plugin-security'
-import pluginSonar from 'eslint-plugin-sonarjs'
-import pluginStylistic from '@stylistic/eslint-plugin'
-import pluginSvelte from 'eslint-plugin-svelte'
-import pluginUnicorn from 'eslint-plugin-unicorn'
-import pluginTailwindcss from 'eslint-plugin-better-tailwindcss'
+import pluginSonarJs from 'eslint-plugin-sonarjs'
+import ts from 'typescript-eslint'
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
+const tsStrictTypeAwareRules = Object.assign(
+  {},
+  ...ts.configs.strictTypeChecked.map((v) => v.rules).filter(Boolean),
+)
 
+const tsStylisticTypeAwareRules = Object.assign(
+  {},
+  ...ts.configs.stylisticTypeChecked.map((v) => v.rules).filter(Boolean),
+)
 
-export default antfu({},
-  includeIgnoreFile(gitignorePath),
-  js.configs.recommended,
-  ...ts.configs.strictTypeChecked,
-  ...ts.configs.stylisticTypeChecked,
+const pluginLoveRules = Object.entries(pluginLove.rules)
+  .filter((v) => Boolean(v[1]) && v[0].startsWith('@typescript-eslint'))
+  .map((v) => ({ [v[0]]: v[1] }))
+  .reduce((p, c) => ({ ...p, ...c }))
 
-  pluginJsdoc.configs['flat/recommended-typescript'],
-  pluginUnicorn.configs.recommended,
-  pluginSecurity.configs.recommended,
-  pluginSonar.configs.recommended,
-  pluginCompat.configs['flat/recommended'],
-
-  ...pluginSvelte.configs.recommended,
-  ...pluginSvelte.configs.prettier,
-
-  // prettierConfig, // Disables rules that conflict with prettier formatting
-
-  pluginStylistic.configs.customize({
-    braceStyle: '1tbs',
-    arrowParens: true
-  }),
-
+export default antfu(
   {
-    ...pluginLove,
-    languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
-      parserOptions: {
-        parser: ts.parser,
-        projectService: true,
-        project: false,
-        tsconfigRootDir: import.meta.dirname,
-        extraFileExtensions: ['.svelte'],
+    type: 'app',
+    lessOpinionated: true,
+    jsx: false,
+    formatters: {
+      css: true,
+      html: true,
+    },
+    svelte: {
+      overrides: {
+        'svelte/html-quotes': ['warn', { prefer: 'double' }],
       },
     },
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
+    typescript: {
+      tsconfigPath: 'tsconfig.json',
+      overrides: {
+        '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+        '@typescript-eslint/no-unused-vars': ['error', {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        }],
+      },
+      filesTypeAware: ['**/*.{ts,svelte}'],
+      overridesTypeAware: {
+        // ...pluginLoveRules,
+        // ...tsStrictTypeAwareRules,
+        // ...tsStylisticTypeAwareRules,
+      },
     },
+    stylistic: {
+      braceStyle: '1tbs',
+      overrides: {
+        'style/eol-last': 'off',
+        'style/arrow-parens': 'error',
+        'style/indent': ['error', 2, { ignoredNodes: ['TSTypeAnnotation'] }],
+        'style/max-len': [
+          'error',
+          {
+            code: 120,
+            ignoreUrls: true,
+            ignoreStrings: true,
+            ignoreTemplateLiterals: true,
+          },
+        ],
+      },
+    },
+    unicorn: {
+      allRecommended: true,
+      overrides: {
+        'unicorn/prevent-abbreviations': 'off', // Nah
+        'unicorn/no-abusive-eslint-disable': 'off',
+      },
+    },
+    jsdoc: true,
     settings: {
       jsdoc: { ignoreInternal: true },
     },
+  },
+
+  { ...pluginSecurity.configs.recommended, name: 'security' },
+  { ...pluginCompat.configs['flat/recommended'], name: 'compat' },
+  { ...pluginSonarJs.configs.recommended, name: 'sonarjs ' },
+  // { name: 'love', languageOptions: { parserOptions: { tsconfigPath: './tsconfig.ts' } }, rules: pluginLoveRules },
+  {
+    name: 'better-tailwindcss',
+    files: ['**/*.svelte'],
+    extends: [pluginBetterTailwindcss.configs['recommended-warn']],
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: 'src/routes/layout.css',
+      },
+    },
+  },
+
+  {
+
+    name: 'Additional Global Rules',
     rules: {
-      // Core
-      'no-void': 'off', // conflicts with no-floating-promises
-      'no-undef': 'off', // typescript-eslint recommend that you do not use this
-      'complexity': 'off', // conflicts with sonarjs/cognitive-complexity
-      // 'prefer-arrow-callback': 'error',
-      // 'promise/avoid-new': 'off',
+      'no-unused-vars': 'off',
 
-      // Typescript plugin
-      '@typescript-eslint/no-unused-vars': 'off', // tsserver already reports this
-      '@typescript-eslint/strict-boolean-expressions': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      // '@typescript-eslint/no-magic-numbers': 'off',
-      '@typescript-eslint/no-unsafe-type-assertion': 'off',
-      '@typescript-eslint/prefer-destructuring': 'off',
-      '@typescript-eslint/init-declarations': 'off',
-
-      // Unicorn plugin
-      'unicorn/prevent-abbreviations': 'off', // Nah
-
-      // JsDoc plugin
+      // jsdoc plugin
       'jsdoc/check-indentation': 'warn',
       'jsdoc/no-bad-blocks': 'warn',
       'jsdoc/no-blank-blocks': 'warn',
@@ -92,47 +115,46 @@ export default antfu({},
       'jsdoc/sort-tags': 'warn',
       'jsdoc/require-returns': 'off',
 
-      // Security plugin
+      // security plugin
       'security/detect-object-injection': 'off',
-    }
+
+      // sonarjs plugin
+      'sonarjs/todo-tag': 'warn',
+      'sonarjs/deprecation': 'off', // breaks svelte
+
+      // import plugin
+      'unused-imports/no-unused-vars': 'off',
+      'import/consistent-type-specifier-style': 'off',
+
+      // eslint-comments plugin
+      'eslint-comments/no-unlimited-disable': 'off',
+    },
   },
 
   {
+    name: 'Additional Svelte Rules',
     files: ['**/*.svelte'],
-    plugins: {
-      "better-tailwindcss": pluginTailwindcss,
-    },
     settings: {
       svelte: {
         ignoreWarnings: [
-          '@typescript-eslint/no-unsafe-assignment',
-          '@typescript-eslint/no-unsafe-return',
-          '@typescript-eslint/no-unsafe-member-access',
-          '@typescript-eslint/no-unsafe-argument',
-          '@typescript-eslint/no-confusing-void-expression',
-          '@typescript-eslint/promise-function-async',
-          '@typescript-eslint/no-base-to-string', // Breaks completely in svelte
+          'ts/no-unsafe-assignment',
+          'ts/no-unsafe-return',
+          'ts/no-unsafe-member-access',
+          'ts/no-unsafe-argument',
+          'ts/no-confusing-void-expression',
+          'ts/promise-function-async',
           'sonarjs/no-extra-arguments', // Does not pickup svelte's snippet args
           'sonarjs/no-use-of-empty-return-value', // Does not work with svelte's snippets
           'sonarjs/no-unused-vars', // ^^
         ],
       },
-      "better-tailwindcss": {
-        // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-        "entryPoint": "src/routes/layout.css",
-      }
     },
     rules: {
-      // Unicorn plugin
-      'unicorn/filename-case': ['error', { case: 'pascalCase', ignore: [/^\+.*\.svelte$/] }], // Enforce pascal case for svelte files, ignore sveltekit's special files like +page.svelte
-
-      // Svelte plugin
-      // Stricter
-      'svelte/no-target-blank': 'error',
-      'svelte/prefer-const': 'error',
-      'prefer-const': 'off', // Conflicts svelte's prefer-const rules
-      'svelte/prefer-destructured-store-props': 'error',
-      'svelte/require-optimized-style-attribute': 'error',
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['error', {
+        printWidth: 120,
+        group: 'newLine',
+        preferSingleLine: true,
+      }],
       // More opinionated style
       'svelte/consistent-selector-style': 'error',
       'svelte/html-closing-bracket-spacing': 'error',
@@ -144,18 +166,10 @@ export default antfu({},
       'svelte/shorthand-attribute': 'error',
       'svelte/shorthand-directive': 'error',
 
-      // Sonarjs plugin
-      'sonarjs/no-unused-collection': 'off', // Doesn't work with svelte processor at all.
-      'sonarjs/deprecation': 'off', // ^^
+      // Enforce pascal case for svelte files, ignore sveltekit's special files like +page.svelte
+      'unicorn/filename-case': ['error', { case: 'pascalCase', ignore: [/^\+.*\.svelte$/] }],
 
-      // Better Tailwindcss plugin
-      ...pluginTailwindcss.configs["recommended-error"].rules,
-      'better-tailwindcss/enforce-consistent-line-wrapping': ['error', {
-        printWidth: 100,
-        group: 'newLine',
-        preferSingleLine: true
-      }],
-      'better-tailwindcss/no-unregistered-classes': 'off'
-    }
-  }
+    },
+  },
 )
+
